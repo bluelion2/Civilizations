@@ -1,12 +1,18 @@
 import React, { Component } from 'react';
-import './maps';
 
+export default class Maps extends Component<{lat: number, lan: number}> {
 
-export default class Maps extends Component {
+    constructor(props: {lat: number, lan: number}) {
+        super(props);
+        this.state = {
+            lat: props.lat,
+            lan: props.lan
+        }
+    }
+
     render() {
         return(
-            <div className="maps-container">
-                Map Component
+            <div className="maps-container" id="map">
             </div>
         );
     }
