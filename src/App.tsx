@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import './App.scss';
+import Input from './main/input';
+import Login from './main/login';
+
 
 declare var google: any;
 declare let window: any;
 declare let map: any;
-
+declare var FB: any;
 class App extends Component {
 
   state = {
@@ -14,13 +17,12 @@ class App extends Component {
   // google map variable
   map: any;
   geocoder: any;
-  googleMapsPromise: any = false;
 
-  async componentDidMount() {
-    await this.setScript();
+  componentDidMount(): void {
+    this.setScript();
   }
 
-  setScript() {
+  setScript(): void {
     const script = document.createElement('script');
     script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBD0xjTlohJCtVepzm6Up7-hQWmsZvU6uk';
     script.async = true;
@@ -29,14 +31,14 @@ class App extends Component {
 
   // 검색해서 해당 주소 찾기
   find() {
-    const geocoder = new google.maps.Geocoder();
+    this.geocoder = new google.maps.Geocoder();
     this.map = new google.maps.Map(document.getElementById('map'), {
       zoom: 10,
       // center: {lat: this.getRandomeMapPoint(), lng: this.getRandomeMapPoint()}
       // center: {lat: 126.97546671970849, lng: 37.5745879197085} // 광화문 기본 셋팅
     });
 
-    geocoder.geocode({'address': this.state.location},
+    this.geocoder.geocode({'address': this.state.location},
       (results: any, status: any) => {
       if (status == 'OK') {
         // console.log(map, 'map function');
@@ -56,6 +58,7 @@ class App extends Component {
     });
   }
 
+  // 텍스트 입력시 location 값 설정
   input(event: any) {
     this.setState({
       location: event.target.value,
@@ -81,12 +84,16 @@ class App extends Component {
     return (
       <div className="App">
         <div>
+          {/* 자식 검색값 -> 부모 컴포넌트로 이동 */}
           <input type="text" placeholder="find location" onChange={() => this.input(event)}></input>
           <button onClick={() => this.find()}>Get location</button>
         </div>
+        <Input></Input>
+
         <div className="map" id="map" onClick={() => this.mapClick()}>
 
         </div>
+        <Login></Login>
       </div>
     );
   }
