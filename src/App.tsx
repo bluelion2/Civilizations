@@ -22,6 +22,7 @@ class App extends Component {
     this.setScript();
   }
 
+  // googlemap 스크립트 삽입
   setScript(): void {
     const script = document.createElement('script');
     script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBD0xjTlohJCtVepzm6Up7-hQWmsZvU6uk';
@@ -30,7 +31,7 @@ class App extends Component {
   }
 
   // 검색해서 해당 주소 찾기
-  find() {
+  find(): void {
     this.geocoder = new google.maps.Geocoder();
     this.map = new google.maps.Map(document.getElementById('map'), {
       zoom: 10,
@@ -65,6 +66,7 @@ class App extends Component {
     })
   }
 
+  // random 좌표 생성
   getRandomeMapPoint(): number {
     return Math.round((Math.random()*360 - 180) * 1000)/1000;
   }
@@ -76,7 +78,7 @@ class App extends Component {
       // console.log(e.latLng, this.map);
       // console.log('===')
       // 클릭 위치 좌표
-      console.log(e.latLng.lat(), e.latLng.lng())
+      console.log('click latlng', e.latLng.lat(), e.latLng.lng())
     });
   }
 
