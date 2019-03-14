@@ -2,30 +2,29 @@ import React, { Component } from 'react';
 
 export default class Input extends Component {
     
-    text: string = '';
     state = {
         location: ''
     }
 
-    input() {
+    input(event: any) {
         this.setState({
-            location: this.text
+            location: event.target.value
         })
     }
 
-    click() {
-
+    submit = (event: any) => {
+        event.preventDefault();
+        console.log(this.state.location);
+        console.log(this.props);
     }
 
     render() {
         return (
-            <div>
+            <form onSubmit={this.submit}>
                 input component
-                <input type="text" placeholder="search location" value={this.text} onChange={() => this.input()}>
-                </input>
-                <button type="button" onClick={() => this.click()}>Search</button>
-            </div>
-           
+                <input type="text" placeholder="search location" value={this.state.location} onChange={() => this.input(event)}></input>
+                <button type="submit">Search</button>
+            </form>
         )
     }
 }
