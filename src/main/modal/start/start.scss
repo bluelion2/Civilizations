@@ -1,0 +1,17 @@
+.start {
+    width: 60vw;
+    @media screen and (max-width: 550px){
+        width: 80vw;
+        padding: 5vw;
+    }
+    margin: 30vh auto;
+    background-color: white;
+    border-radius: 2vw;
+    display: flex;
+    flex-direction: column;
+    padding: 3vw;
+    button {
+        margin-top: 1rem;
+        background-color: skyblue;
+    }
+}

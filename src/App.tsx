@@ -1,30 +1,55 @@
 import React, { Component } from 'react';
 import './App.scss';
 import Header from './main/header/header';
-import Timer from './main/timer/timer';
+import Start from './main/modal/start/start';
+import Success from './main/modal/success/success';
 
+interface Location {
+  lat: number;
+  lng: number;
+  target: string;
+}
 
 declare var google: any;
 declare var window: any;
 declare var map: any;
-class App extends Component {
+export default class App extends Component {
 
   state = {
-    location: '광화문',
+    location: '',
     isLoad: false,
-    time: 100,
+    time: 10,
+    openModal: false,
+    name: '',
   }
+
+  location: Array<Location> = [
+    { lat: 48.8570211197085, lng: 2.2931323197085476, target: 'Eiffel tower' },
+    { lat: 37.5745879197085, lng: 126.97546671970849, target: '광화문' },
+    { lat:  51.5067634197085,lng: -0.07729828029152941, target: 'London tower'},
+    { lat: 40.6879004197085, lng: -74.04584938029149, target: 'status of liberty'},
+    { lat: -113.88604459999999, lng: 35.6745486, target: 'Grand canyan'},
+    { lat: 39.9149957197085, lng: 116.39580561970843, target: 'forbidden palace'},
+    { lat:  41.00723401970851, lng: 28.97882601970855, target: 'Ayasofya'},
+    { lat: 51.1775330197085, lng: -1.8275639802915293, target: 'Stonehenge'}, 
+    { lat: 41.8888612197085, lng: 12.4908819197085, target: 'Colosseum'},
+    { lat: 41.8972618197085, lng: 12.475523919708507, target: 'Pantheon'},
+    { lat: 37.1744622197085, lng: -3.590761100000009, target: 'Calle Real de la Alhambra'},
+    { lat: 27.1736661197085, lng: 78.04080621970843, target: 'Taj Mahal'},
+    { lat: 13.4111203197085, lng: 103.8656367197085, target: 'Angkor Wat'},
+  ]
 
   // google map variable
   _geocoder: any;
-  _map: any;
-  intervalHandle: any;
-  target: any;
+  // intervalHandle: any;
+  // target: any;
 
-  timer: any;
   // lat: 위도(북, 남) , lng: 경도(동, 서)
-  componentDidMount() {
+  componentDidMount(): void {
     this.setScript();
+    // setTimeout(() => {
+    //   this.find();
+    // }, 10000);
   }
 
   // googlemap 스크립트 삽입
@@ -32,7 +57,6 @@ class App extends Component {
     if (document.getElementById('civilization')) { return; }
     const script = document.createElement('script');
     script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBD0xjTlohJCtVepzm6Up7-hQWmsZvU6uk';
-    script.async = true;
     script.defer = true;
     script.id = 'civilization';
     document.head.appendChild(script);
@@ -78,19 +102,31 @@ class App extends Component {
   // }
   
   initMap = (): void => {
+    const latlng = this.randomLatLng();
     window.map = new google.maps.Map(document.getElementById('map'), {
       // center: {lat: this.getRandomeMapPoint(), lng: this.getRandomeMapPoint()}, // 랜덤좌표 셋팅
-      center: { lat: 37.5745879197085, lng: 126.97546671970849}, // 광화문 기본 셋팅
+      // center: {lat: latlng.lat, lng: latlng.lng},
+      center: {lat: 37.5745879197085, lng: 126.97546671970849}, // 광화문 기본 셋팅
       zoom: 15,
     });
-    this._geocoder = new google.maps.Geocoder();
-    this._map = window.map;
-    this.setCircle(37.5745879197085, 126.97546671970849);
+    // this._geocoder = new google.maps.Geocoder();
+    // this._map = window.map;
+    // this.setCircle(37.5745879197085, 126.97546671970849);
+    this.setCircle(latlng.lat, latlng.lng);
+    this.setState({
+      location: latlng.target
+    })
+  }
+
+  randomLatLng = (): Location => {
+    const randomNum= Math.floor(Math.random() * this.location.length);
+    // return this.location[randomNum];
+    return this.location[1]
   }
 
   // // 검색해서 해당 주소 찾기
   // find() {
-  //   this._geocoder.geocode({'address': '광화문'},
+  //   this._geocoder.geocode({'address': 'Angkorwat'},
   //     (results: any, status: any) => {
   //     if (status == 'OK') {
   //       console.log(results);
@@ -105,7 +141,7 @@ class App extends Component {
   //       //   map: this.map,
   //       //   position: results[0].geometry.location
   //       // });
-  //       this.setCircle();
+  //       // this.setCircle();
   //     } else {
   //       console.log('Geocode was not successful for the following reason: ' + status);
   //     }
@@ -113,7 +149,7 @@ class App extends Component {
   // }
 
   setCircle = (lat: number, lng: number): void => {
-    this.target = new google.maps.Circle({
+    const target = new google.maps.Circle({
       strokeColor: '#ffffff',
       strokeOpacity: 0.01,
       strokeWeight: 2,
@@ -127,15 +163,23 @@ class App extends Component {
       radius: 1000,
     });
 
-    window.google.maps.event.addListener(this.target, 'click', (e: any) => {
-      console.log('inner circle', e.latLng);
+    window.google.maps.event.addListener(target, 'click', (e: any) => {
+      console.log(e, typeof e);
       this.success();
     })
   }
 
-  success = () => {
-    alert('성공하셨습니다!');
+  success = (): void => {
+    this.setState({
+      openModal: true
+    })
   } 
+
+  close = (): void => {
+    this.setState({
+      openModal: false
+    })
+  }
 
   // // random 좌표 생성
   // getRandomeMapPoint(): number {
@@ -158,31 +202,35 @@ class App extends Component {
   // 1초당 1씩 감소하는 함수
   // 0이되면 정지
 
-  minusCount = () => {
-    if (this.state.time <= 1) {
-      return;
-    }
+  // minusCount = () => {
+  //   if (this.state.time <= 1) {
+  //     return;
+  //   }
+  //   this.setState({
+  //     time: this.state.time - 1
+  //   })
+  //   console.log(this.state.time);
+  // }
+
+  startGame = (name: string): void => {
     this.setState({
-      time: this.state.time - 1
+      name: name
     })
   }
 
-
-  render(): JSX.Element {
-
-    // const minus = setInterval(this.minusCount, 1000)
-    // setTimeout(() => {
-    //   clearInterval(minus)
-    // }, 5000);
-
+  render(): JSX.Element {    
     return (
       <div className="App">
-        <Header title={this.state.location}></Header>
-        <Timer time={this.state.time}></Timer>
+        <Start onClick={this.startGame}></Start>
+        <Header time={this.state.time} title={this.state.location}></Header>
+        {/* <Modal open={this.state.openModal}>
+          <div>
+            성공하셨습니다!
+            <button onClick={this.close}></button>
+          </div>
+        </Modal> */}
         <div className="map" id="map"></div>
       </div>
     );
   }
 }
-
-export default App;
